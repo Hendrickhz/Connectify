@@ -35,7 +35,7 @@ const ContactRow = ({ contact, isFavoritesPage, showSnackbar }) => {
       onMouseLeave={() => setIsHovered(false)}
       hover={isHovered}
     >
-      <TableCell>
+      <TableCell className=" hover:cursor-pointer" onClick={()=>navigate(`/contact/${contact.id}`)}>
         <div className="flex gap-1 items-center">
           {contact.avatar_link ? (
             <Avatar sizes={""} src={avatarUrl} />

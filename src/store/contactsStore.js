@@ -4,6 +4,7 @@ import supabase from "../config/supabaseClient";
 export const useContactsStore = create((set, get) => ({
   contacts: [],
   // favorites: [],
+  contact: {},
   loading: false,
   error: null,
 
@@ -12,7 +13,7 @@ export const useContactsStore = create((set, get) => ({
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
-      .order('first_name',{ascending:true})
+      .order("first_name", { ascending: true })
       .range(offset, offset + limit - 1)
       .is("deleted_at", null);
 
@@ -20,6 +21,23 @@ export const useContactsStore = create((set, get) => ({
       set({ loading: false, error: error.message });
     } else {
       set({ loading: false, contacts: data });
+    }
+  },
+  fetchContactById: async (contactId) => {
+    set({ loading: true, error: null });
+    const { data, error } = await supabase
+      .from("contacts")
+      .select("*")
+      .eq("id", contactId)
+      .single();
+
+    if (error) {
+      set({ loading: false, error: error.message });
+    } else {
+      set((state) => ({
+        loading: false,
+        contact: data,
+      }));
     }
   },
   fetchFavorites: async () => {
@@ -77,6 +95,26 @@ export const useContactsStore = create((set, get) => ({
               contact.id === contactId ? updatedContact : contact
             ),
       }));
+    }
+  },
+
+  toggleFavoriteById: async (contactId) => {
+    const contact = get().contact;
+    if (!contact || contact.id !== contactId) {
+      set({ error: 'Contact not found' });
+      return;
+    }
+    const updatedContact = { ...contact, is_favorite: !contact.is_favorite };
+
+    const { error } = await supabase
+      .from("contacts")
+      .update({ is_favorite: updatedContact.is_favorite })
+      .eq("id", contactId);
+
+    if (error) {
+      set({ error: error.message });
+    } else {
+      set({ contact: updatedContact });
     }
   },
 

@@ -127,7 +127,7 @@ const Create = () => {
   return (
     <div className=" md:w-[50%] w-[95%] md:pl-10 relative">
       {/* top section  */}
-      <div className="  w-full bg-white z-10 flex justify-between items-center p-4 sticky md:top-[64px] top-[48px]">
+      <div className="  w-full bg-white z-10 flex justify-between items-center py-4 sticky md:top-[64px] top-[48px]">
         <IconButton onClick={handleBackToHome}>
           <ArrowBack />
         </IconButton>
