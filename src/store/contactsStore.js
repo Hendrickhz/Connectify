@@ -12,6 +12,7 @@ export const useContactsStore = create((set, get) => ({
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
+      .order('first_name',{ascending:true})
       .range(offset, offset + limit - 1)
       .is("deleted_at", null);
 
@@ -53,7 +54,7 @@ export const useContactsStore = create((set, get) => ({
     }
   },
 
-  toggleFavorite: async (contactId) => {
+  toggleFavorite: async (contactId, isFavoritesView = false) => {
     const contact = get().contacts.find((contact) => contact.id === contactId);
     const updatedContact = { ...contact, is_favorite: !contact.is_favorite };
 
@@ -66,9 +67,15 @@ export const useContactsStore = create((set, get) => ({
       set({ error: error.message });
     } else {
       set((state) => ({
-        contacts: state.contacts.map((contact) =>
-          contact.id === contactId ? updatedContact : contact
-        ),
+        contacts: updatedContact.is_favorite
+          ? state.contacts.map((contact) =>
+              contact.id === contactId ? updatedContact : contact
+            )
+          : isFavoritesView
+          ? state.contacts.filter((contact) => contact.id !== contactId)
+          : state.contacts.map((contact) =>
+              contact.id === contactId ? updatedContact : contact
+            ),
       }));
     }
   },

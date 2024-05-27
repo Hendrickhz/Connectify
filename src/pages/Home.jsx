@@ -1,5 +1,4 @@
 import {
-  Avatar,
   CircularProgress,
   Paper,
   Table,
@@ -11,12 +10,13 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { useAuth } from "../context/authContext";
+
 import { useContactsStore } from "../store/contactsStore";
 import { useEffect, useState } from "react";
-import Avvvatars from "avvvatars-react";
-import supabase from "../config/supabaseClient";
+
+
 import ContactRow from "../components/form/ContactRow";
+import useSnackbar from "../hooks/useSnackbar";
 
 const Home = () => {
   const {
@@ -33,11 +33,7 @@ const Home = () => {
   useEffect(() => {
     fetchContacts(rowsPerPage, page * rowsPerPage);
   }, [fetchContacts, page, rowsPerPage]);
-  const getAvatarUrl = (filePath) => {
-    const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-
-    return data.publicUrl;
-  };
+ 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -46,7 +42,9 @@ const Home = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  console.log(contacts);
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
+ 
+
   if (loading) {
     return (
       <div className=" w-full h-[80vh] flex items-center justify-center">
@@ -62,19 +60,23 @@ const Home = () => {
       </div>
     );
   }
+
   return (
     <div>
-       <div className="flex gap-2 items-center mb-5">
-       <Typography variant="h5" className="">Contacts </Typography> <small>({contacts.length})</small>
-       </div>
-      <TableContainer component={Paper}>
-        <Table>
+      <SnackbarComponent />
+      <div className="flex gap-2 items-center mb-5">
+        <Typography variant="h5" className="">
+          Contacts{" "}
+        </Typography>{" "}
+        <small>({contacts.length})</small>
+      </div>
+      <TableContainer component={Paper} sx={{ maxHeight: 490 }}>
+        <Table stickyHeader aria-label="sticky table" >
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Phone</TableCell>
-
               <TableCell>Job Title & Company</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -82,7 +84,13 @@ const Home = () => {
           <TableBody>
             {contacts.map((contact) => {
               return (
-                <ContactRow key={contact.id} contact={contact}/>
+                <ContactRow
+                  key={contact.id}
+                  contact={contact}
+                  isFavoritesPage={false}
+                  showSnackbar={showSnackbar}
+                 
+                />
               );
             })}
           </TableBody>
