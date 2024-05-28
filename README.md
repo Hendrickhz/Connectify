@@ -33,7 +33,7 @@ Features
 Technology Stack
 ----------------
 
-*   **Front-end**: React
+*   **Front-end**: React + MUI
     
 *   **State Management**: Zustand
     
@@ -46,7 +46,7 @@ Technology Stack
 
 
 
-1.  The application will be available at [Here](https://connectify.vercel.app/).
+1.  The application will be available at [Here](https://connectify-by-hendrick.vercel.app/).
     
 
 Usage

@@ -94,10 +94,10 @@ const Edit = () => {
         "Enter a valid email"
       ),
       phone_1: Yup.string("Enter your primary phone number")
-        .matches(/^[0-9]+$/, "Phone number must be digits")
+        .matches(/^[0-9-]+$/, "Phone number must be digits")
         .required("Primary phone number is required"),
       phone_2: Yup.string("Enter your secondary phone number").matches(
-        /^[0-9]+$/,
+        /^[0-9-]+$/,
         "Phone number must be digits"
       ),
       street_address: Yup.string("Enter your street address"),
