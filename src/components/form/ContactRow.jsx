@@ -11,6 +11,7 @@ import { Delete, Edit, Favorite, FavoriteBorder } from "@mui/icons-material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useContactsStore } from "../../store/contactsStore";
+import DeleteContactButton from "../DeleteContactButton";
 
 const ContactRow = ({ contact, isFavoritesPage, showSnackbar }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -71,11 +72,7 @@ const ContactRow = ({ contact, isFavoritesPage, showSnackbar }) => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete">
-            <IconButton
-            //   onClick={() => onDelete(contact.id)}
-            >
-              <Delete />
-            </IconButton>
+            <DeleteContactButton id={contact.id} showSnackbar={showSnackbar} isFavoritesPage={isFavoritesPage}/>
           </Tooltip>
         </div>
       </TableCell>

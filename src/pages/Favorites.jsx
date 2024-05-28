@@ -1,5 +1,4 @@
 import {
-  Avatar,
   CircularProgress,
   Paper,
   Table,
@@ -13,20 +12,12 @@ import {
 } from "@mui/material";
 import { useContactsStore } from "../store/contactsStore";
 import { useEffect } from "react";
-import Avvvatars from "avvvatars-react";
-import useAvatarUrl from "../hooks/useAvatarUrl";
+
 import ContactRow from "../components/form/ContactRow";
 import useSnackbar from "../hooks/useSnackbar";
 
 const Favorites = () => {
-  const {
-    contacts,
-    loading,
-    error,
-    fetchFavorites,
-    toggleFavorite,
-    softDeleteContact,
-  } = useContactsStore();
+  const { contacts, loading, error, fetchFavorites } = useContactsStore();
   const { showSnackbar, SnackbarComponent } = useSnackbar();
   useEffect(() => {
     fetchFavorites();
@@ -55,7 +46,7 @@ const Favorites = () => {
         <small>({contacts.length})</small>
       </div>
       <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
-        <Table stickyHeader >
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>

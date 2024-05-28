@@ -24,7 +24,7 @@ export const useContactsStore = create((set, get) => ({
     }
   },
   fetchContactById: async (contactId) => {
-    set({ loading: true, error: null });
+    set({ loading: true, error: null, contact: {} });
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
@@ -54,9 +54,21 @@ export const useContactsStore = create((set, get) => ({
       set({ loading: false, contacts: data });
     }
   },
-
-  updateContact: async (updatedContact) => {
+  fetchTrashes: async () => {
+    set({ loading: true, error: null });
     const { data, error } = await supabase
+      .from("contacts")
+      .select("*")
+      .not("deleted_at", "is", null);
+
+    if (error) {
+      set({ loading: false, error: error.message });
+    } else {
+      set({ loading: false, contacts: data });
+    }
+  },
+  updateContact: async (updatedContact) => {
+    const { error } = await supabase
       .from("contacts")
       .update(updatedContact)
       .eq("id", updatedContact.id);
@@ -76,7 +88,7 @@ export const useContactsStore = create((set, get) => ({
     const contact = get().contacts.find((contact) => contact.id === contactId);
     const updatedContact = { ...contact, is_favorite: !contact.is_favorite };
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("contacts")
       .update({ is_favorite: updatedContact.is_favorite })
       .eq("id", contactId);
@@ -101,7 +113,7 @@ export const useContactsStore = create((set, get) => ({
   toggleFavoriteById: async (contactId) => {
     const contact = get().contact;
     if (!contact || contact.id !== contactId) {
-      set({ error: 'Contact not found' });
+      set({ error: "Contact not found" });
       return;
     }
     const updatedContact = { ...contact, is_favorite: !contact.is_favorite };
@@ -119,7 +131,7 @@ export const useContactsStore = create((set, get) => ({
   },
 
   softDeleteContact: async (contactId) => {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("contacts")
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", contactId);
@@ -134,7 +146,7 @@ export const useContactsStore = create((set, get) => ({
   },
 
   deleteContact: async (contactId) => {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("contacts")
       .delete()
       .eq("id", contactId);
@@ -144,7 +156,27 @@ export const useContactsStore = create((set, get) => ({
     } else {
       set((state) => ({
         contacts: state.contacts.filter((contact) => contact.id !== contactId),
+        contact: {},
       }));
+    }
+  },
+
+  restoreContact: async (contactId) => {
+    const { error } = await supabase
+      .from("contacts")
+      .update({ deleted_at: null })
+      .eq("id", contactId);
+
+    if (error) {
+      set({ error: error.message });
+    } else {
+      set((state) => {
+        const updatedContact = { ...state.contact, deleted_at: null };
+        return {
+          contact: updatedContact,
+          contacts: state.contacts.filter((contact) => contact.id !== contactId),
+        };
+      });
     }
   },
 }));

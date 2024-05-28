@@ -1,6 +1,6 @@
 import {
   ArrowBack,
-  Delete,
+  DescriptionOutlined,
   Favorite,
   FavoriteBorder,
   LocalPhoneOutlined,
@@ -21,6 +21,10 @@ import { useContactsStore } from "../store/contactsStore";
 import { useEffect } from "react";
 import useAvatarUrl from "../hooks/useAvatarUrl";
 import useSnackbar from "../hooks/useSnackbar";
+import DeleteContactButton from "../components/DeleteContactButton";
+import { useFormatTime } from "../hooks/useFormatTime";
+import DeleteForeverButton from "../components/DeleteForeverButton";
+import RestoreContactButton from "../components/RestoreContactButton";
 
 const Detail = () => {
   const navigate = useNavigate();
@@ -38,14 +42,13 @@ const Detail = () => {
   const handleToggleFavoriteById = async () => {
     await toggleFavoriteById(contact.id);
     showSnackbar(
-      contact.is_favorite
-        ? 'Removed from favorites.'
-        : 'Added to favorites.',
-      'success'
+      contact.is_favorite ? "Removed from favorites." : "Added to favorites.",
+      "success"
     );
   };
-  const avatarUrl = useAvatarUrl(contact.avatar_link);
-
+  const avatarUrl = useAvatarUrl(contact?.avatar_link || "");
+  console.log(avatarUrl);
+  const deletedAt = useFormatTime(contact?.deleted_at);
   if (loading) {
     return (
       <div className=" w-full h-[80vh] flex items-center justify-center">
@@ -70,38 +73,37 @@ const Detail = () => {
           <IconButton onClick={handleBackToHome}>
             <ArrowBack />
           </IconButton>
-          <div className=" flex gap-3 items-center">
-            {contact.is_favorite ? (
-              <IconButton onClick={handleToggleFavoriteById}>
-                <Favorite className=" text- text-pink-500" />
-              </IconButton>
-            ) : (
-              <IconButton onClick={handleToggleFavoriteById}>
-                <FavoriteBorder />
-              </IconButton>
-            )}
+          {contact.deleted_at == null ? (
+            <div className=" flex gap-3 items-center">
+              {contact.is_favorite ? (
+                <IconButton onClick={handleToggleFavoriteById}>
+                  <Favorite className=" text- text-pink-500" />
+                </IconButton>
+              ) : (
+                <IconButton onClick={handleToggleFavoriteById}>
+                  <FavoriteBorder />
+                </IconButton>
+              )}
 
-            <Button
-              variant="contained"
-              // onClick={formik.submitForm}
-              className="  rounded-full px-6 py-2 normal-case "
-            >
-              Edit
-            </Button>
-
-            <IconButton
-            //  onClick={handleFavorite}
-            >
-              <Delete />
-            </IconButton>
-          </div>
+              <Button
+                variant="contained"
+                onClick={() => navigate(`/edit/${contact.id}`)}
+                className="  rounded-full px-6 py-2 normal-case "
+              >
+                Edit
+              </Button>
+              <DeleteContactButton id={id} showSnackbar={showSnackbar} />
+            </div>
+          ) : (
+            ""
+          )}
         </div>
         {/* top section  */}
 
         {/* avatar section  */}
         <div className="flex gap-8 items-center">
           <Avatar
-            src={avatarUrl ? avatarUrl : ""}
+            src={contact.avatar_link == null ? "" : avatarUrl}
             sx={{
               width: 150,
               height: 150,
@@ -123,32 +125,64 @@ const Detail = () => {
         {/* avatar section  */}
         <Divider className=" my-8" />
 
+        {deletedAt ? (
+          <div className="p-4 bg-slate-100  rounded-2xl mb-4 ">
+            <Typography fontSize={20}>Why in Trash?</Typography>
+            <p className=" mt-2">Deleted At {deletedAt}</p>
+            <div className="w-full flex justify-end">
+              <DeleteForeverButton
+                id={contact.id}
+                isDetailPage={true}
+                showSnackbar={showSnackbar}
+              />
+              <RestoreContactButton
+                id={contact.id}
+                isDetailPage={true}
+                showSnackbar={showSnackbar}
+              />
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
         {/* contact detail  */}
         <div className="p-4 bg-slate-100  rounded-2xl  ">
-          <Typography fontSize={18}>Contact Details</Typography>
+          <Typography fontSize={20}>Contact Details</Typography>
 
-          <div className="mt-4 flex flex-col gap-4">
-            <div className=" flex gap-4 ">
-              <MailOutline />{" "}
-              <div className=" flex flex-col gap-4">
-                <Link
-                  color={"inherit"}
-                  underline={"hover"}
-                  href={`mailto:${contact.email_1}`}
-                >
-                  {contact.email_1}
-                </Link>
-                {contact.email_2 && (
+          <div className="mt-4 flex flex-col gap-2">
+            {contact.email_1 ? (
+              <div className=" flex gap-4 ">
+                <MailOutline />{" "}
+                <div className=" flex flex-col gap-4">
                   <Link
                     color={"inherit"}
                     underline={"hover"}
-                    href={`mailto:${contact.email_2}`}
+                    href={`mailto:${contact.email_1}`}
                   >
-                    {contact.email_2}
+                    {contact.email_1}
                   </Link>
-                )}
+                  {contact.email_2 && (
+                    <Link
+                      color={"inherit"}
+                      underline={"hover"}
+                      href={`mailto:${contact.email_2}`}
+                    >
+                      {contact.email_2}
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className=" flex gap-4 ">
+                <MailOutline />{" "}
+                <RouterLink
+                  to={`/edit/${contact.id}`}
+                  className=" text-blue-600 no-underline"
+                >
+                  Add email
+                </RouterLink>
+              </div>
+            )}
             <div className=" flex gap-4 ">
               <LocalPhoneOutlined />{" "}
               <div className="flex flex-col gap-4">
@@ -170,22 +204,37 @@ const Detail = () => {
                 )}
               </div>
             </div>
-            <div className=" flex gap-4 ">
-              <LocationOnOutlined />{" "}
-              {contact.city_address || contact.street_address ? (
+
+            {contact.city_address || contact.street_address ? (
+              <div className=" flex gap-4 ">
+                <LocationOnOutlined />{" "}
                 <div className="flex flex-col gap-4">
                   <p>{contact.street_address} </p>
                   <p>{contact.city_address}</p>
                 </div>
-              ) : (
+              </div>
+            ) : contact.deleted_at == null ? (
+              <div className=" flex gap-4 ">
+                <LocationOnOutlined />{" "}
                 <RouterLink
                   to={`/edit/${contact.id}`}
                   className=" text-blue-600 no-underline"
                 >
                   Add address
                 </RouterLink>
-              )}
-            </div>
+              </div>
+            ) : (
+              ""
+            )}
+
+            {contact.notes ? (
+              <div className="flex gap-4">
+                <DescriptionOutlined />
+                <p>{contact.notes}</p>
+              </div>
+            ) : (
+              ""
+            )}
           </div>
         </div>
         {/* contact detail  */}
