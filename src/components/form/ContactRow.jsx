@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useContactsStore } from "../../store/contactsStore";
 import DeleteContactButton from "../DeleteContactButton";
 
-const ContactRow = ({ contact, isFavoritesPage, showSnackbar }) => {
+const ContactRow = ({ contact, isFavoritesPage, showSnackbar, isMobile }) => {
   const [isHovered, setIsHovered] = useState(false);
   const avatarUrl = useAvatarUrl(contact.avatar_link);
   const navigate = useNavigate();
@@ -21,10 +21,10 @@ const ContactRow = ({ contact, isFavoritesPage, showSnackbar }) => {
   const handleToggleFavorite = async () => {
     try {
       await toggleFavorite(contact.id, isFavoritesPage);
-      if(contact.is_favorite){
+      if (contact.is_favorite) {
         showSnackbar("Removed from the favorites");
-      }else{
-        showSnackbar("Added to the favorites")
+      } else {
+        showSnackbar("Added to the favorites");
       }
     } catch (error) {
       showSnackbar(error.message);
@@ -36,7 +36,10 @@ const ContactRow = ({ contact, isFavoritesPage, showSnackbar }) => {
       onMouseLeave={() => setIsHovered(false)}
       hover={isHovered}
     >
-      <TableCell className=" hover:cursor-pointer" onClick={()=>navigate(`/contact/${contact.id}`)}>
+      <TableCell
+        className=" hover:cursor-pointer"
+        onClick={() => navigate(`/contact/${contact.id}`)}
+      >
         <div className="flex gap-1 items-center">
           {contact.avatar_link ? (
             <Avatar sizes={""} src={avatarUrl} />
@@ -48,12 +51,14 @@ const ContactRow = ({ contact, isFavoritesPage, showSnackbar }) => {
           </span>
         </div>
       </TableCell>
-      <TableCell>{contact.email_1}</TableCell>
+      {!isMobile && <TableCell>{contact.email_1}</TableCell>}
       <TableCell>{contact.phone_1}</TableCell>
-      <TableCell>
-        <p>{contact.job_title}</p>
-        <small>{contact.company}</small>
-      </TableCell>
+      {!isMobile && (
+        <TableCell>
+          <p>{contact.job_title}</p>
+          <small>{contact.company}</small>
+        </TableCell>
+      )}
       <TableCell colSpan={1}>
         <div
           style={{ display: "flex", gap: "10px" }}
@@ -68,11 +73,15 @@ const ContactRow = ({ contact, isFavoritesPage, showSnackbar }) => {
           </Tooltip>
           <Tooltip title={contact.is_favorite ? "Unfavorite" : "Favorite"}>
             <IconButton onClick={handleToggleFavorite}>
-              {contact.is_favorite ? <Favorite className=" text-pink-500" /> : <FavoriteBorder />}
+              {contact.is_favorite ? (
+                <Favorite className=" text-pink-500" />
+              ) : (
+                <FavoriteBorder />
+              )}
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete">
-            <DeleteContactButton id={contact.id} showSnackbar={showSnackbar} isFavoritesPage={isFavoritesPage}/>
+            <DeleteContactButton id={contact.id} showSnackbar={showSnackbar} />
           </Tooltip>
         </div>
       </TableCell>

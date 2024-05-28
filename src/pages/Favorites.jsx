@@ -1,4 +1,5 @@
 import {
+  Box,
   CircularProgress,
   Paper,
   Table,
@@ -6,7 +7,6 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
@@ -45,6 +45,7 @@ const Favorites = () => {
         </Typography>{" "}
         <small>({contacts.length})</small>
       </div>
+      {contacts.length > 0 ?(
       <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
         <Table stickyHeader>
           <TableHead>
@@ -71,6 +72,11 @@ const Favorites = () => {
           </TableBody>
         </Table>
       </TableContainer>
+    ) : (
+        <Box>
+          <Typography>No contact in Favorites.</Typography>
+        </Box>
+      )}
       <SnackbarComponent />
     </div>
   );

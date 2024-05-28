@@ -5,6 +5,7 @@ export const useContactsStore = create((set, get) => ({
   contacts: [],
   // favorites: [],
   contact: {},
+  totalCount: 0,
   loading: false,
   error: null,
 
@@ -65,6 +66,16 @@ export const useContactsStore = create((set, get) => ({
       set({ loading: false, error: error.message });
     } else {
       set({ loading: false, contacts: data });
+    }
+  },
+  fetchTotalCount: async () => {
+    const { count, error } = await supabase
+      .from("contacts")
+      .select("*", { count: "exact" })
+      .is("deleted_at", null);
+
+    if (!error) {
+      set({ totalCount: count });
     }
   },
   updateContact: async (updatedContact) => {
@@ -142,6 +153,7 @@ export const useContactsStore = create((set, get) => ({
       set((state) => ({
         contacts: state.contacts.filter((contact) => contact.id !== contactId),
       }));
+      get().fetchTotalCount();
     }
   },
 
@@ -160,6 +172,22 @@ export const useContactsStore = create((set, get) => ({
       }));
     }
   },
+  deleteTrash: async () => {
+    const { error } = await supabase
+      .from("contacts")
+      .delete()
+      .not("deleted_at", "is", null);
+
+    if (error) {
+      set({ error: error.message });
+    } else {
+      set((state) => ({
+        contacts: [],
+        contact: {},
+      }));
+      get().fetchTrashes();
+    }
+  },
 
   restoreContact: async (contactId) => {
     const { error } = await supabase
@@ -174,9 +202,31 @@ export const useContactsStore = create((set, get) => ({
         const updatedContact = { ...state.contact, deleted_at: null };
         return {
           contact: updatedContact,
-          contacts: state.contacts.filter((contact) => contact.id !== contactId),
+          contacts: state.contacts.filter(
+            (contact) => contact.id !== contactId
+          ),
         };
       });
+      get().fetchTotalCount();
     }
   },
+  emptyTrash: async () => {
+    const { data, error } = await supabase
+      .from("contacts")
+      .update({ deleted_at: null })
+      .not("deleted_at", "is", null);
+  
+    if (error) {
+      set({ error: error.message });
+    } else {
+      set((state) => ({
+        contacts: state.contacts.map(contact =>
+          contact.deleted_at !== null ? { ...contact, deleted_at: null } : contact
+        )
+      }));
+      get().fetchTotalCount();
+      get().fetchTrashes();
+    }
+  },
+  
 }));

@@ -7,6 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import { useState } from "react";
 import { useContactsStore } from "../store/contactsStore";
@@ -34,9 +35,11 @@ const DeleteForeverButton = ({ id, showSnackbar, isDetailPage = false }) => {
           Delete Forever
         </Button>
       ) : (
+        <Tooltip title="Delete Forever">
         <IconButton onClick={handleOpen}>
           <DeleteForever />
         </IconButton>
+        </Tooltip>
       )}
 
       <Dialog

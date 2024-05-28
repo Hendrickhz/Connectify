@@ -10,7 +10,6 @@ import {
   LocationOn,
   MailOutline,
   PersonOutline,
-  Remove,
 } from "@mui/icons-material";
 import { Button, IconButton, TextField } from "@mui/material";
 import { useState } from "react";

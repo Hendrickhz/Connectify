@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import useSnackbar from "../hooks/useSnackbar";
 import { useContactsStore } from "../store/contactsStore";
 import {
+  Box,
   CircularProgress,
   Paper,
   Table,
@@ -13,6 +14,8 @@ import {
   Typography,
 } from "@mui/material";
 import TrashRow from "../components/form/TrashRow";
+import RestoreAllContactsButton from "../components/RestoreAllContactsButton";
+import EmptyTrashButton from "../components/EmptyTrashButton";
 
 const Trash = () => {
   const { contacts, loading, error, fetchTrashes } = useContactsStore();
@@ -37,32 +40,52 @@ const Trash = () => {
   }
   return (
     <div>
-      <div className="flex gap-2 items-center mb-5">
-        <Typography variant="h5" className="">
-          Trash{" "}
-        </Typography>{" "}
-        <small>({contacts.length})</small>
+      <div className="flex gap-8 mb-5">
+        <div className="flex gap-2 items-center ">
+          <Typography variant="h5" className="">
+            Trash{" "}
+          </Typography>{" "}
+          <small>({contacts.length})</small>
+        </div>
+        {contacts.length > 0 ? (
+          <div className="flex gap-2">
+            <RestoreAllContactsButton showSnackbar={showSnackbar} />
+            <EmptyTrashButton showSnackbar={showSnackbar} />
+          </div>
+        ) : (
+          ""
+        )}
       </div>
-      <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
+      {contacts.length > 0 ? (
+        <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
 
-              <TableCell>Date Deleted</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {contacts.map((contact) => {
-              return (
-            
-               <TrashRow contact={contact} key={contact.id} showSnackbar={showSnackbar}/>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                <TableCell>Date Deleted</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {contacts.map((contact) => {
+                return (
+                  <TrashRow
+                    contact={contact}
+                    key={contact.id}
+                    showSnackbar={showSnackbar}
+                  />
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <Box>
+          <Typography>No contact in Trash.</Typography>
+        </Box>
+      )}
+
       <SnackbarComponent />
     </div>
   );

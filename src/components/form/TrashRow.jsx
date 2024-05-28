@@ -53,13 +53,13 @@ const TrashRow = ({ contact, showSnackbar }) => {
             isHovered ? "visible opacity-100" : "invisible opacity-0"
           }`}
         >
-          <Tooltip title="Restore">
+          
           <RestoreContactButton  id={contact.id} showSnackbar={showSnackbar}/>
-          </Tooltip>
+        
 
-          <Tooltip title="Delete Forever">
+        
            <DeleteForeverButton id={contact.id} showSnackbar={showSnackbar}/>
-          </Tooltip>
+       
         </div>
       </TableCell>
     </TableRow>

@@ -92,7 +92,11 @@ const Detail = () => {
               >
                 Edit
               </Button>
-              <DeleteContactButton id={id} showSnackbar={showSnackbar} />
+              <DeleteContactButton
+                id={id}
+                showSnackbar={showSnackbar}
+                isDetailPage={true}
+              />
             </div>
           ) : (
             ""

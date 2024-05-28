@@ -1,4 +1,5 @@
 import {
+  Box,
   CircularProgress,
   Paper,
   Table,
@@ -9,11 +10,12 @@ import {
   TablePagination,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import { useContactsStore } from "../store/contactsStore";
 import { useEffect, useState } from "react";
-
 
 import ContactRow from "../components/form/ContactRow";
 import useSnackbar from "../hooks/useSnackbar";
@@ -24,16 +26,19 @@ const Home = () => {
     loading,
     error,
     fetchContacts,
-    toggleFavorite,
-    softDeleteContact,
+    totalCount,
+    fetchTotalCount,
   } = useContactsStore();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
+    fetchTotalCount();
+  }, [fetchTotalCount]);
+  useEffect(() => {
     fetchContacts(rowsPerPage, page * rowsPerPage);
   }, [fetchContacts, page, rowsPerPage]);
- 
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -43,8 +48,9 @@ const Home = () => {
     setPage(0);
   };
   const { showSnackbar, SnackbarComponent } = useSnackbar();
- 
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   if (loading) {
     return (
       <div className=" w-full h-[80vh] flex items-center justify-center">
@@ -68,42 +74,50 @@ const Home = () => {
         <Typography variant="h5" className="">
           Contacts{" "}
         </Typography>{" "}
-        <small>({contacts.length})</small>
+        <small>({totalCount})</small>
       </div>
-      <TableContainer component={Paper} sx={{ maxHeight: 490 }}>
-        <Table stickyHeader aria-label="sticky table" >
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Job Title & Company</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {contacts.map((contact) => {
-              return (
-                <ContactRow
-                  key={contact.id}
-                  contact={contact}
-                  isFavoritesPage={false}
-                  showSnackbar={showSnackbar}
-                 
-                />
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        component="div"
-        count={-1} // Total count is unknown
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      {contacts.length > 0 ? (
+        <>
+          <TableContainer component={Paper} sx={{ maxHeight: 490 }}>
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  {!isMobile && <TableCell>Email</TableCell>}
+                  <TableCell>Phone</TableCell>
+                  {!isMobile && <TableCell>Job Title & Company</TableCell>}
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {contacts.map((contact) => {
+                  return (
+                    <ContactRow
+                      key={contact.id}
+                      contact={contact}
+                      isFavoritesPage={false}
+                      showSnackbar={showSnackbar}
+                      isMobile={isMobile}
+                    />
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            component="div"
+            count={totalCount}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </>
+      ) : (
+        <Box>
+          <Typography>No contact at the moment.</Typography>
+        </Box>
+      )}
     </div>
   );
 };

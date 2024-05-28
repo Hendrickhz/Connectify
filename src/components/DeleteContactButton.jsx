@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useContactsStore } from "../store/contactsStore";
 import { useNavigate } from "react-router-dom";
 
-const DeleteContactButton = ({ id, showSnackbar, isFavoritesPage = false }) => {
+const DeleteContactButton = ({ id, showSnackbar, isDetailPage = false }) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -23,12 +23,10 @@ const DeleteContactButton = ({ id, showSnackbar, isFavoritesPage = false }) => {
     showSnackbar("1 Contact Deleted.");
     handleClose();
     setTimeout(() => {
-      if (isFavoritesPage) {
-        navigate("/favorites");
-      } else {
+      if (isDetailPage) {
         navigate("/");
-      }
-    }, 3000);
+      } 
+    }, 1000);
   };
   return (
     <div>
