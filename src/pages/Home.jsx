@@ -1,5 +1,4 @@
 import {
-  Box,
   CircularProgress,
   Paper,
   Table,
@@ -19,6 +18,7 @@ import { useEffect, useState } from "react";
 
 import ContactRow from "../components/form/ContactRow";
 import useSnackbar from "../hooks/useSnackbar";
+import { useAuth } from "../context/authContext";
 
 const Home = () => {
   const {
@@ -31,7 +31,8 @@ const Home = () => {
   } = useContactsStore();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
+  const { session } = useAuth();
+  console.log(session.user);
   useEffect(() => {
     fetchTotalCount();
   }, [fetchTotalCount]);
@@ -114,9 +115,9 @@ const Home = () => {
           />
         </>
       ) : (
-        <Box>
+        <div>
           <Typography>No contact at the moment.</Typography>
-        </Box>
+        </div>
       )}
     </div>
   );

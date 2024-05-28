@@ -7,6 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import { useState } from "react";
 import { useContactsStore } from "../store/contactsStore";
@@ -25,14 +26,16 @@ const DeleteContactButton = ({ id, showSnackbar, isDetailPage = false }) => {
     setTimeout(() => {
       if (isDetailPage) {
         navigate("/");
-      } 
+      }
     }, 1000);
   };
   return (
-    <div>
-      <IconButton onClick={handleOpen}>
-        <Delete />
-      </IconButton>
+    <>
+      <Tooltip title="Delete">
+        <IconButton onClick={handleOpen}>
+          <Delete />
+        </IconButton>
+      </Tooltip>
 
       <Dialog
         open={open}
@@ -45,8 +48,7 @@ const DeleteContactButton = ({ id, showSnackbar, isDetailPage = false }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            This contact will be permanently deleted from this account after 30
-            days.
+            This contact will be moved to the Trash.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -58,7 +60,7 @@ const DeleteContactButton = ({ id, showSnackbar, isDetailPage = false }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

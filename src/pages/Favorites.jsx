@@ -9,6 +9,8 @@ import {
   TableHead,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useContactsStore } from "../store/contactsStore";
 import { useEffect } from "react";
@@ -19,6 +21,8 @@ import useSnackbar from "../hooks/useSnackbar";
 const Favorites = () => {
   const { contacts, loading, error, fetchFavorites } = useContactsStore();
   const { showSnackbar, SnackbarComponent } = useSnackbar();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   useEffect(() => {
     fetchFavorites();
   }, [fetchFavorites]);
@@ -45,34 +49,34 @@ const Favorites = () => {
         </Typography>{" "}
         <small>({contacts.length})</small>
       </div>
-      {contacts.length > 0 ?(
-      <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
-
-              <TableCell>Job Title & Company</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {contacts.map((contact) => {
-              return (
-                <ContactRow
-                  key={contact.id}
-                  contact={contact}
-                  showSnackbar={showSnackbar}
-                  isFavoritesPage={true}
-                />
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    ) : (
+      {contacts.length > 0 ? (
+        <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                {!isMobile && <TableCell>Email</TableCell>}
+                <TableCell>Phone</TableCell>
+                {!isMobile && <TableCell>Job Title & Company</TableCell>}
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {contacts.map((contact) => {
+                return (
+                  <ContactRow
+                    key={contact.id}
+                    contact={contact}
+                    showSnackbar={showSnackbar}
+                    isFavoritesPage={true}
+                    isMobile={isMobile}
+                  />
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
         <Box>
           <Typography>No contact in Favorites.</Typography>
         </Box>

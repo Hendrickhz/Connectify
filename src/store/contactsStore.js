@@ -21,7 +21,7 @@ export const useContactsStore = create((set, get) => ({
     if (error) {
       set({ loading: false, error: error.message });
     } else {
-      set({ loading: false, contacts: data });
+      set({ loading: false, contacts: data, contact:{} });
     }
   },
   fetchContactById: async (contactId) => {
@@ -52,7 +52,7 @@ export const useContactsStore = create((set, get) => ({
     if (error) {
       set({ loading: false, error: error.message });
     } else {
-      set({ loading: false, contacts: data });
+      set({ loading: false, contacts: data, contact:{} });
     }
   },
   fetchTrashes: async () => {
@@ -65,7 +65,7 @@ export const useContactsStore = create((set, get) => ({
     if (error) {
       set({ loading: false, error: error.message });
     } else {
-      set({ loading: false, contacts: data });
+      set({ loading: false, contacts: data , contact:{} });
     }
   },
   fetchTotalCount: async () => {

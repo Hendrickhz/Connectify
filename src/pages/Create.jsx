@@ -25,6 +25,7 @@ const Create = () => {
   const navigate = useNavigate();
   const { session } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState(null);
 
   const [showPhone2Input, setShowPhone2Input] = useState(false);
@@ -88,6 +89,7 @@ const Create = () => {
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
+        setIsLoading(true);
         let avatarLink = null;
         if (file) {
           const fileExt = file.name.split(".").pop();
@@ -120,6 +122,7 @@ const Create = () => {
         showSnackbar(error.message, "error");
       } finally {
         setSubmitting(false);
+        setIsLoading(false);
       }
     },
   });
@@ -144,6 +147,7 @@ const Create = () => {
           <Button
             variant="contained"
             onClick={formik.submitForm}
+            disabled={isLoading}
             className="  rounded-full px-6 py-2 normal-case "
           >
             Save

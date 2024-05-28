@@ -80,9 +80,9 @@ const ContactRow = ({ contact, isFavoritesPage, showSnackbar, isMobile }) => {
               )}
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+        
             <DeleteContactButton id={contact.id} showSnackbar={showSnackbar} />
-          </Tooltip>
+         
         </div>
       </TableCell>
     </TableRow>

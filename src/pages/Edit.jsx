@@ -24,15 +24,15 @@ import AvatarUpload from "../components/form/AvatarUpload";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import useSnackbar from "../hooks/useSnackbar";
-import { useAuth } from "../context/authContext";
 import supabase from "../config/supabaseClient";
 import { useContactsStore } from "../store/contactsStore";
+import { useAuth } from "../context/authContext";
 const Edit = () => {
   const navigate = useNavigate();
-  const { session } = useAuth();
   const { id } = useParams();
   const { contact, loading, error, fetchContactById } = useContactsStore();
-
+  const { session } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     fetchContactById(id);
   }, [fetchContactById, id]);
@@ -64,18 +64,19 @@ const Edit = () => {
 
   const formik = useFormik({
     initialValues: {
-      first_name: contact.first_name,
-      last_name: contact.last_name,
-      company: contact.company,
-      job_title: contact.job_title,
-      email_1: contact.email_1,
-      email_2: contact.email_2,
-      phone_1: contact.phone_1,
-      phone_2: contact.phone_2,
-      street_address: contact.street_address,
-      city_address: contact.city_address,
-      notes: contact.notes,
+      first_name: contact?.first_name || "",
+      last_name: contact?.last_name || "",
+      company: contact?.company || "",
+      job_title: contact?.job_title || "",
+      email_1: contact?.email_1 || "",
+      email_2: contact?.email_2 || "",
+      phone_1: contact?.phone_1 || "",
+      phone_2: contact?.phone_2 || "",
+      street_address: contact?.street_address || "",
+      city_address: contact?.city_address || "",
+      notes: contact?.notes || "",
     },
+    enableReinitialize: true,
     validationSchema: Yup.object({
       first_name: Yup.string("Enter your first name").required(
         "First name is required"
@@ -104,6 +105,7 @@ const Edit = () => {
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
+        setIsLoading(true);
         let avatarLink = contact.avatar_link;
         if (file) {
           const fileExt = file.name.split(".").pop();
@@ -136,6 +138,7 @@ const Edit = () => {
         showSnackbar(error.message, "error");
       } finally {
         setSubmitting(false);
+        setIsLoading(false);
       }
     },
   });
@@ -175,6 +178,7 @@ const Edit = () => {
           <Button
             variant="contained"
             onClick={formik.submitForm}
+            disabled={isLoading}
             className="  rounded-full px-6 py-2 normal-case "
           >
             Save
