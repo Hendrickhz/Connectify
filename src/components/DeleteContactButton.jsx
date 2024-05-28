@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { useContactsStore } from "../store/contactsStore";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/authContext";
 
 const DeleteContactButton = ({ id, showSnackbar, isDetailPage = false }) => {
   const [open, setOpen] = useState(false);
@@ -19,8 +20,11 @@ const DeleteContactButton = ({ id, showSnackbar, isDetailPage = false }) => {
   const handleClose = () => setOpen(false);
   const { softDeleteContact } = useContactsStore();
   const navigate = useNavigate();
+
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   const handleDelete = async () => {
-    await softDeleteContact(id);
+    await softDeleteContact(id, userId);
     showSnackbar("1 Contact Deleted.");
     handleClose();
     setTimeout(() => {

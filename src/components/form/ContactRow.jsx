@@ -12,15 +12,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useContactsStore } from "../../store/contactsStore";
 import DeleteContactButton from "../DeleteContactButton";
+import { useAuth } from "../../context/authContext";
 
 const ContactRow = ({ contact, isFavoritesPage, showSnackbar, isMobile }) => {
   const [isHovered, setIsHovered] = useState(false);
   const avatarUrl = useAvatarUrl(contact.avatar_link);
   const navigate = useNavigate();
   const { toggleFavorite } = useContactsStore();
+
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   const handleToggleFavorite = async () => {
     try {
-      await toggleFavorite(contact.id, isFavoritesPage);
+      await toggleFavorite(contact.id, userId, isFavoritesPage);
       if (contact.is_favorite) {
         showSnackbar("Removed from the favorites");
       } else {
@@ -80,9 +84,8 @@ const ContactRow = ({ contact, isFavoritesPage, showSnackbar, isMobile }) => {
               )}
             </IconButton>
           </Tooltip>
-        
-            <DeleteContactButton id={contact.id} showSnackbar={showSnackbar} />
-         
+
+          <DeleteContactButton id={contact.id} showSnackbar={showSnackbar} />
         </div>
       </TableCell>
     </TableRow>

@@ -32,10 +32,11 @@ const Edit = () => {
   const { id } = useParams();
   const { contact, loading, error, fetchContactById } = useContactsStore();
   const { session } = useAuth();
+  const userId = session?.user?.id;
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
-    fetchContactById(id);
-  }, [fetchContactById, id]);
+    fetchContactById(id, userId);
+  }, [fetchContactById, id, userId]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [file, setFile] = useState(null);
 

@@ -25,8 +25,11 @@ import DeleteContactButton from "../components/DeleteContactButton";
 import { useFormatTime } from "../hooks/useFormatTime";
 import DeleteForeverButton from "../components/DeleteForeverButton";
 import RestoreContactButton from "../components/RestoreContactButton";
+import { useAuth } from "../context/authContext";
 
 const Detail = () => {
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   const navigate = useNavigate();
   const handleBackToHome = () => {
     navigate("/");
@@ -36,18 +39,17 @@ const Detail = () => {
   const { contact, loading, error, fetchContactById, toggleFavoriteById } =
     useContactsStore();
   useEffect(() => {
-    fetchContactById(id);
-  }, [fetchContactById, id]);
+    fetchContactById(id, userId);
+  }, [fetchContactById, id, userId]);
 
   const handleToggleFavoriteById = async () => {
-    await toggleFavoriteById(contact.id);
+    await toggleFavoriteById(contact.id, userId);
     showSnackbar(
       contact.is_favorite ? "Removed from favorites." : "Added to favorites.",
       "success"
     );
   };
   const avatarUrl = useAvatarUrl(contact?.avatar_link || "");
-  console.log(avatarUrl);
   const deletedAt = useFormatTime(contact?.deleted_at);
   if (loading) {
     return (

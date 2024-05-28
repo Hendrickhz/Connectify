@@ -29,9 +29,9 @@ const Register = () => {
       try {
         await signup(values.email, values.password);
         showSnackbar("Register Successful. Please Login");
-      setTimeout(()=>{
-        navigate("/login");
-      },3000)
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       } catch (error) {
         // setErrors({ server: error.message });
         showSnackbar(error.message, "error");
@@ -42,17 +42,17 @@ const Register = () => {
   });
 
   return (
-    <div className="min-h-screen flex">
-      <div className="w-1/2 bg-blue-600 flex items-center justify-center">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      <div className="md:w-1/2 flex items-center justify-center bg-blue-600 p-4">
         <img
           src={CoverImage}
           alt="Connectify"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover md:block hidden"
         />
       </div>
-      <div className="w-1/2 flex items-center justify-center p-8">
+      <div className="md:w-1/2 flex items-center justify-center p-8 md:h-auto h-[80vh] ">
         <div className="max-w-md w-full">
-          <AuthPageHeader/>
+          <AuthPageHeader />
           <form onSubmit={formik.handleSubmit}>
             <TextField
               id="email"

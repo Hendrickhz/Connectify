@@ -16,13 +16,16 @@ import {
 import TrashRow from "../components/form/TrashRow";
 import RestoreAllContactsButton from "../components/RestoreAllContactsButton";
 import EmptyTrashButton from "../components/EmptyTrashButton";
+import { useAuth } from "../context/authContext";
 
 const Trash = () => {
   const { contacts, loading, error, fetchTrashes } = useContactsStore();
   const { showSnackbar, SnackbarComponent } = useSnackbar();
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   useEffect(() => {
-    fetchTrashes();
-  }, [fetchTrashes]);
+    fetchTrashes(userId);
+  }, [fetchTrashes, userId]);
   if (loading) {
     return (
       <div className=" w-full h-[80vh] flex items-center justify-center">

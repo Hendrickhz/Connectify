@@ -32,13 +32,13 @@ const Home = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { session } = useAuth();
-  console.log(session.user);
+  const userId = session?.user?.id;
   useEffect(() => {
-    fetchTotalCount();
-  }, [fetchTotalCount]);
+    fetchTotalCount(userId);
+  }, [fetchTotalCount, userId]);
   useEffect(() => {
-    fetchContacts(rowsPerPage, page * rowsPerPage);
-  }, [fetchContacts, page, rowsPerPage]);
+    fetchContacts(rowsPerPage, page * rowsPerPage, userId);
+  }, [fetchContacts, page, rowsPerPage, userId]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

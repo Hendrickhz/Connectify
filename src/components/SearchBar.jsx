@@ -15,6 +15,7 @@ import {
   useTheme,
 } from "@mui/material";
 import SearchItem from "./SearchItem";
+import { useAuth } from "../context/authContext";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -57,6 +58,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 const SearchBar = () => {
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -73,6 +76,7 @@ const SearchBar = () => {
       const { data, error } = await supabase
         .from("contacts")
         .select("*")
+        .eq("user_id", userId)
         .ilike("first_name", `%${searchQuery}%`);
 
       if (error) {
@@ -85,7 +89,6 @@ const SearchBar = () => {
       setLoading(false);
     }
   };
-
 
   // Debounced search function
   const debouncedSearch = useCallback(
@@ -133,7 +136,11 @@ const SearchBar = () => {
         <Paper elevation={3} className=" z-10">
           <List>
             {results.map((result) => (
-              <SearchItem key={result.id} contact={result} handleItemClick={handleItemClick}  />
+              <SearchItem
+                key={result.id}
+                contact={result}
+                handleItemClick={handleItemClick}
+              />
             ))}
           </List>
         </Paper>

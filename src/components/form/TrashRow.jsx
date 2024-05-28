@@ -21,7 +21,6 @@ const TrashRow = ({ contact, showSnackbar }) => {
   const avatarUrl = useAvatarUrl(contact.avatar_link);
   const navigate = useNavigate();
   const deletedAt = useFormatTime(contact.deleted_at);
-  // const { toggleFavorite } = useContactsStore();
 
   return (
     <TableRow

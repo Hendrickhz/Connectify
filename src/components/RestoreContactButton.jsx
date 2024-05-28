@@ -1,17 +1,17 @@
 import { Replay } from "@mui/icons-material";
 import { Button, IconButton, Tooltip } from "@mui/material";
 import { useContactsStore } from "../store/contactsStore";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/authContext";
 
 const RestoreContactButton = ({ id, showSnackbar, isDetailPage = false }) => {
   const { restoreContact } = useContactsStore();
-  const navigate = useNavigate();
+
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   const handleRestore = async () => {
-    await restoreContact(id);
+    await restoreContact(id,userId);
     showSnackbar("1 Contact Restored.");
-    // setTimeout(() => {
-    //   navigate("/trash");
-    // }, 3000);
+
   };
   return (
     <div>

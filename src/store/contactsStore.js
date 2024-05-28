@@ -3,17 +3,17 @@ import supabase from "../config/supabaseClient";
 
 export const useContactsStore = create((set, get) => ({
   contacts: [],
-  // favorites: [],
   contact: {},
   totalCount: 0,
   loading: false,
   error: null,
 
-  fetchContacts: async (limit, offset) => {
+  fetchContacts: async (limit, offset, userId) => {
     set({ loading: true, error: null });
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
+      .eq("user_id", userId)
       .order("first_name", { ascending: true })
       .range(offset, offset + limit - 1)
       .is("deleted_at", null);
@@ -21,15 +21,16 @@ export const useContactsStore = create((set, get) => ({
     if (error) {
       set({ loading: false, error: error.message });
     } else {
-      set({ loading: false, contacts: data, contact:{} });
+      set({ loading: false, contacts: data, contact: {} });
     }
   },
-  fetchContactById: async (contactId) => {
+  fetchContactById: async (contactId, userId) => {
     set({ loading: true, error: null, contact: {} });
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
       .eq("id", contactId)
+      .eq("user_id", userId)
       .single();
 
     if (error) {
@@ -41,67 +42,55 @@ export const useContactsStore = create((set, get) => ({
       }));
     }
   },
-  fetchFavorites: async () => {
+  fetchFavorites: async (userId) => {
     set({ loading: true, error: null });
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
       .eq("is_favorite", true)
+      .eq("user_id", userId)
       .is("deleted_at", null);
 
     if (error) {
       set({ loading: false, error: error.message });
     } else {
-      set({ loading: false, contacts: data, contact:{} });
+      set({ loading: false, contacts: data, contact: {} });
     }
   },
-  fetchTrashes: async () => {
+  fetchTrashes: async (userId) => {
     set({ loading: true, error: null });
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
+      .eq("user_id", userId)
       .not("deleted_at", "is", null);
 
     if (error) {
       set({ loading: false, error: error.message });
     } else {
-      set({ loading: false, contacts: data , contact:{} });
+      set({ loading: false, contacts: data, contact: {} });
     }
   },
-  fetchTotalCount: async () => {
+  fetchTotalCount: async (userId) => {
     const { count, error } = await supabase
       .from("contacts")
       .select("*", { count: "exact" })
+      .eq("user_id", userId)
       .is("deleted_at", null);
 
     if (!error) {
       set({ totalCount: count });
     }
   },
-  updateContact: async (updatedContact) => {
-    const { error } = await supabase
-      .from("contacts")
-      .update(updatedContact)
-      .eq("id", updatedContact.id);
 
-    if (error) {
-      set({ error: error.message });
-    } else {
-      set((state) => ({
-        contacts: state.contacts.map((contact) =>
-          contact.id === updatedContact.id ? updatedContact : contact
-        ),
-      }));
-    }
-  },
-
-  toggleFavorite: async (contactId, isFavoritesView = false) => {
+  toggleFavorite: async (contactId, userId, isFavoritesView = false) => {
     const contact = get().contacts.find((contact) => contact.id === contactId);
     const updatedContact = { ...contact, is_favorite: !contact.is_favorite };
 
     const { error } = await supabase
       .from("contacts")
       .update({ is_favorite: updatedContact.is_favorite })
+      .eq("user_id", userId)
       .eq("id", contactId);
 
     if (error) {
@@ -121,7 +110,7 @@ export const useContactsStore = create((set, get) => ({
     }
   },
 
-  toggleFavoriteById: async (contactId) => {
+  toggleFavoriteById: async (contactId, userId) => {
     const contact = get().contact;
     if (!contact || contact.id !== contactId) {
       set({ error: "Contact not found" });
@@ -132,6 +121,7 @@ export const useContactsStore = create((set, get) => ({
     const { error } = await supabase
       .from("contacts")
       .update({ is_favorite: updatedContact.is_favorite })
+      .eq("user_id", userId)
       .eq("id", contactId);
 
     if (error) {
@@ -141,10 +131,11 @@ export const useContactsStore = create((set, get) => ({
     }
   },
 
-  softDeleteContact: async (contactId) => {
+  softDeleteContact: async (contactId, userId) => {
     const { error } = await supabase
       .from("contacts")
       .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", userId)
       .eq("id", contactId);
 
     if (error) {
@@ -157,10 +148,11 @@ export const useContactsStore = create((set, get) => ({
     }
   },
 
-  deleteContact: async (contactId) => {
+  deleteContact: async (contactId, userId) => {
     const { error } = await supabase
       .from("contacts")
       .delete()
+      .eq("user_id", userId)
       .eq("id", contactId);
 
     if (error) {
@@ -172,10 +164,11 @@ export const useContactsStore = create((set, get) => ({
       }));
     }
   },
-  deleteTrash: async () => {
+  emptyTrash: async (userId) => {
     const { error } = await supabase
       .from("contacts")
       .delete()
+      .eq("user_id", userId)
       .not("deleted_at", "is", null);
 
     if (error) {
@@ -189,10 +182,11 @@ export const useContactsStore = create((set, get) => ({
     }
   },
 
-  restoreContact: async (contactId) => {
+  restoreContact: async (contactId, userId) => {
     const { error } = await supabase
       .from("contacts")
       .update({ deleted_at: null })
+      .eq("user_id", userId)
       .eq("id", contactId);
 
     if (error) {
@@ -210,23 +204,32 @@ export const useContactsStore = create((set, get) => ({
       get().fetchTotalCount();
     }
   },
-  emptyTrash: async () => {
-    const { data, error } = await supabase
+  restoreAllContacts: async (userId) => {
+    const { error } = await supabase
       .from("contacts")
       .update({ deleted_at: null })
-      .not("deleted_at", "is", null);
-  
+      .eq("user_id", userId);
+
     if (error) {
       set({ error: error.message });
     } else {
-      set((state) => ({
-        contacts: state.contacts.map(contact =>
-          contact.deleted_at !== null ? { ...contact, deleted_at: null } : contact
-        )
-      }));
+      set((state) => {
+        return {
+          contact: {},
+          contacts: [],
+        };
+      });
       get().fetchTotalCount();
-      get().fetchTrashes();
     }
   },
-  
+
+  logoutStore: () => {
+    set({
+      contacts: [],
+      contact: {},
+      totalCount: 0,
+      loading: false,
+      error: null,
+    });
+  },
 }));

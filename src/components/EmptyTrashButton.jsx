@@ -9,15 +9,17 @@ import {
 
 import { useContactsStore } from "../store/contactsStore";
 import { useState } from "react";
+import { useAuth } from "../context/authContext";
 
 const EmptyTrashButton = ({ showSnackbar }) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const { emptyTrash } = useContactsStore();
-
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   const handleEmptyTrash = async () => {
-    await emptyTrash();
+    await emptyTrash(userId);
     showSnackbar("Trash is empty.");
   };
   return (

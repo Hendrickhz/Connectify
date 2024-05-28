@@ -17,15 +17,19 @@ import { useEffect } from "react";
 
 import ContactRow from "../components/form/ContactRow";
 import useSnackbar from "../hooks/useSnackbar";
+import { useAuth } from "../context/authContext";
 
 const Favorites = () => {
   const { contacts, loading, error, fetchFavorites } = useContactsStore();
   const { showSnackbar, SnackbarComponent } = useSnackbar();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   useEffect(() => {
-    fetchFavorites();
-  }, [fetchFavorites]);
+    fetchFavorites(userId);
+  }, [fetchFavorites, userId]);
   if (loading) {
     return (
       <div className=" w-full h-[80vh] flex items-center justify-center">

@@ -1,11 +1,14 @@
 import { Button } from "@mui/material";
 import { useContactsStore } from "../store/contactsStore";
+import { useAuth } from "../context/authContext";
 
 
 const RestoreAllContactsButton = ({  showSnackbar, }) => {
   const { restoreAllContacts } = useContactsStore();
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   const handleRestoreAll = async () => {
-    await restoreAllContacts();
+    await restoreAllContacts(userId);
     showSnackbar("All Contacts Restored.");
    
   };

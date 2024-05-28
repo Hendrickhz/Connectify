@@ -6,10 +6,12 @@ import { Link, useNavigate } from "react-router-dom";
 import CoverImage from "/cover-3.svg";
 import useSnackbar from "../../hooks/useSnackbar";
 import AuthPageHeader from "../../components/AuthPageHeader";
+
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const { showSnackbar, SnackbarComponent } = useSnackbar();
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -23,18 +25,11 @@ const Login = () => {
         .min(6, "Password must be at least 6 characters")
         .required("Password is required"),
     }),
-    onSubmit: async (
-      values,
-      {
-        setSubmitting,
-        // setErrors
-      }
-    ) => {
+    onSubmit: async (values, { setSubmitting }) => {
       try {
         await login(values.email, values.password);
         navigate("/");
       } catch (error) {
-        // setErrors({ server: error.message });
         showSnackbar(error.message, "error");
       } finally {
         setSubmitting(false);
@@ -43,17 +38,17 @@ const Login = () => {
   });
 
   return (
-    <div className="min-h-screen flex">
-      <div className="w-1/2 bg-blue-600 flex items-center justify-center">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      <div className="md:w-1/2 flex items-center justify-center bg-blue-600 p-4">
         <img
           src={CoverImage}
           alt="Connectify"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover md:block hidden"
         />
       </div>
-      <div className="w-1/2 flex items-center justify-center p-8">
+      <div className="md:w-1/2 flex items-center justify-center p-8 md:h-auto h-[80vh] ">
         <div className="max-w-md w-full">
-          <AuthPageHeader/>
+          <AuthPageHeader />
           <form onSubmit={formik.handleSubmit}>
             <TextField
               id="email"
@@ -82,10 +77,9 @@ const Login = () => {
               fullWidth
               margin="normal"
             />
-
             <Button
               type="submit"
-              className="bg-blue-600 mt-4 py-3  text-[16px]"
+              className="bg-blue-600 mt-4 py-3 text-[16px]"
               variant="contained"
               fullWidth
               disabled={formik.isSubmitting}
